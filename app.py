@@ -49,49 +49,46 @@ def get_career_info(career):
 
 # Configuración de la aplicación Streamlit
 st.title("Sugerencia de Carreras")
-st.write("Responde las siguientes preguntas para obtener sugerencias de carreras.")
+st.write("Selecciona las opciones que mejor te describan para obtener sugerencias de carreras.")
 
-# Preguntas para el usuario
-questions = [
-    "¿Cuál es tu edad?",
-    "¿Cuáles son tus materias favoritas en la escuela?",
-    "¿Cuáles son tus hobbies o intereses?",
-    "¿Cómo describirías tu personalidad?",
-    "¿Qué habilidades consideras que son tus puntos fuertes?",
-    "¿Qué tipo de ambiente de trabajo prefieres?",
-    "¿Cuáles son tus expectativas salariales?",
-    "¿Prefieres trabajar en equipo o de forma independiente?",
-    "¿Qué impacto te gustaría tener en el mundo a través de tu carrera?"
-]
+# Preguntas y opciones para el usuario
+questions_and_options = {
+    "¿En qué rango de edad te encuentras?": ["15-18", "19-22", "23-26", "27 o más"],
+    "¿Cuáles son tus materias favoritas en la escuela?": ["Matemáticas", "Ciencias", "Literatura", "Historia", "Arte", "Educación Física"],
+    "¿Cuáles son tus principales intereses?": ["Tecnología", "Naturaleza", "Arte y Cultura", "Negocios", "Ayudar a otros", "Deportes"],
+    "¿Cómo describirías tu personalidad?": ["Extrovertido", "Introvertido", "Analítico", "Creativo", "Líder", "Colaborador"],
+    "¿Cuáles consideras que son tus habilidades más fuertes?": ["Resolución de problemas", "Comunicación", "Creatividad", "Organización", "Trabajo en equipo", "Habilidades técnicas"],
+    "¿Qué tipo de ambiente de trabajo prefieres?": ["Oficina tradicional", "Trabajo remoto", "Ambiente al aire libre", "Laboratorio", "Ambiente creativo", "Variado/Dinámico"],
+    "¿Cuáles son tus expectativas salariales?": ["Menos de $30,000 al año", "$30,000 - $50,000 al año", "$50,000 - $80,000 al año", "Más de $80,000 al año"],
+    "¿Prefieres trabajar en equipo o de forma independiente?": ["Principalmente en equipo", "Principalmente de forma independiente", "Una mezcla de ambos"],
+    "¿Qué impacto te gustaría tener en el mundo a través de tu carrera?": ["Avance tecnológico", "Cuidado del medio ambiente", "Mejora de la salud", "Educación", "Justicia social", "Innovación empresarial"]
+}
 
 user_responses = {}
-for question in questions:
-    user_responses[question] = st.text_input(question)
+for question, options in questions_and_options.items():
+    user_responses[question] = st.selectbox(question, options)
 
 if st.button("Obtener sugerencias de carrera"):
-    if all(user_responses.values()):
-        with st.spinner("Analizando tus respuestas..."):
-            # Formatear las respuestas del usuario
-            formatted_responses = "\n".join([f"{q}: {a}" for q, a in user_responses.items()])
-            
-            # Obtener sugerencias de carrera
-            suggestions = get_career_suggestions(formatted_responses)
-            st.subheader("Sugerencias de Carrera:")
-            st.write(suggestions)
-            
-            # Extraer los nombres de las carreras sugeridas
-            career_names = [line.split(":")[0].strip()[3:] for line in suggestions.split("\n") if line.strip().startswith(("1.", "2.", "3."))]
-            
-            # Obtener información adicional sobre cada carrera sugerida
-            st.subheader("Información Adicional:")
-            for career in career_names:
-                st.write(f"### {career}")
-                career_info = get_career_info(career)
-                for info in career_info:
-                    st.write(f"- [{info['title']}]({info['link']})")
-                    st.write(info['snippet'])
-                st.write("---")
-    else:
-        st.warning("Por favor, responde todas las preguntas antes de solicitar sugerencias.")
+    with st.spinner("Analizando tus respuestas..."):
+        # Formatear las respuestas del usuario
+        formatted_responses = "\n".join([f"{q}: {a}" for q, a in user_responses.items()])
+        
+        # Obtener sugerencias de carrera
+        suggestions = get_career_suggestions(formatted_responses)
+        st.subheader("Sugerencias de Carrera:")
+        st.write(suggestions)
+        
+        # Extraer los nombres de las carreras sugeridas
+        career_names = [line.split(":")[0].strip()[3:] for line in suggestions.split("\n") if line.strip().startswith(("1.", "2.", "3."))]
+        
+        # Obtener información adicional sobre cada carrera sugerida
+        st.subheader("Información Adicional:")
+        for career in career_names:
+            st.write(f"### {career}")
+            career_info = get_career_info(career)
+            for info in career_info:
+                st.write(f"- [{info['title']}]({info['link']})")
+                st.write(info['snippet'])
+            st.write("---")
 
 st.sidebar.write("Esta aplicación utiliza las APIs de Together y Serper para proporcionar sugerencias de carrera e información adicional.")
